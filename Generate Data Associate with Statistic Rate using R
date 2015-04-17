@@ -1,0 +1,77 @@
+#############################################################################################
+##                    Generate Data Associate with Rate
+##
+## Code by Kevin Qun Liu
+## Data Source: ALABAMA.GOV
+## Date: March 21, 2015
+##
+## This program used for generating data by sample using the known rate and it provided 
+## the input of the data entry, and it will be automatically combine all the data form 
+## one dataset for future use.
+##
+## Var:
+## name: county name
+## c1~c8: the rate associate with 8 types of crime
+##
+#############################################################################################
+
+# function used to generate data
+
+Crime_gen <- Crime_make <- function(n=10,name,c1,c2,c3,c4,c5,c6,c7,c8,type=wide,digits=2) {
+  
+  rownamer <- function(dataframe){
+    x <- as.data.frame(dataframe)
+    rownames(x) <- NULL
+    return(x)
+  }
+  
+  Crime_fround <- function(dataframe, digits = 0){
+    Crime <- dataframe
+    Crime[,sapply(Crime, is.numeric)] <-round(Crime[,sapply(Crime, is.numeric)], digits) 
+    return(Crime)
+  }
+  
+  TYPE <- as.character(substitute(type))
+  Crime <- data.frame(id = paste0("ID.", 1:n), 
+                      county= sample(c(name), n, replace = TRUE),
+                      crime= sample(c("murder", "robbery", "rape", "assault", "burglary", "forced entry", "larceny", "auto theft"), n, replace = TRUE, prob=c(c1,c2,c3,c4,c5,c6,c7,c8)),
+                      history = sample(c("yes", "no"), n, replace = TRUE), 
+                      race = sample(c("black", "white", "asian"), n, 
+                                    replace = TRUE, prob=c(.262, .685, .011)), 
+                      gender = sample(c("male", "female","NA"), n, replace = TRUE, prob=c(.60,.16,.24)), 
+                      age = sample(c("18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35"), n, replace = TRUE, prob=c(.0507,.0516,.0449,.0419,.0439,.0424,.0367,.1554,.1554,.1554,.1554,.1554,.1301,.1301,.1301,.1301,.1301,.0962)),
+                      m.status = sample(c("never", "married", "divorced", "widowed"), 
+                                        n, replace = TRUE, prob=c(.25, .4, .3, .05)), 
+                      political = sample(c("democrat", "republican", 
+                                           "independent", "other"), n, replace= TRUE, 
+                                         prob=c(.35, .35, .20, .1)),
+                      n.kids = rpois(n, 1.5), 
+                      income = sample(c(seq(0, 30000, by=1000), 
+                                        seq(0, 150000, by=1000)), n, replace=TRUE)
+  )
+  
+  return(Crime_fround(Crime, digits=digits))
+  
+}
+
+# set print
+options(max.print=999999)
+
+# use generate function generate data and combine data with visible view.
+
+Jeff<- Crime_make(10083,"Jefferson",.00375, .07008, .00998, .06081, .21186, .0, .54569, .09783)
+Mobi<- Crime_make(3867,"Mobile",.00207,.02364,.00857,.19031,.23138,.15219,.46454,.07949)
+Madi<- Crime_make(3886,"Madison",.00106,.00822,.00557,.40796,.15596,.09151,.34774,.07348)
+Mont<- Crime_make(5617,"Montgomery",0,.01305,.00326,.39722,.17863,.12316,.34747,.06036)
+Shel<- Crime_make(1360,"Shelby",0,.01685,.01123,.07209,.31928,.16948,.51030,.07022)
+Tusc<- Crime_make(8625,"Tuscaloosa",.00138,.03651,.00443,.25951,.16586,.10153,.49371,.03859)
+Bald<- Crime_make(1502,"Baldwin",0,.00459,.01758,.21865,.24158,.16438,.46636,.05122)
+Henr<- Crime_make(3103,"Henry",0,.01027,.01027,.41439,.19521,.12671,.29452,.07534)
+Morg<- Crime_make(9616,"Morgan",0,.01949,.00519,.30258,.15407,.10971,.47967,.03898)
+Hale<- Crime_make(3208,"Hale",.00228,.02739,.01369,.40411,.20091,.10502,.30594,.04566)
+dat<-rbind(Jeff,Mobi,Madi,Mont,Shel,Tusc,Bald,Henr,Morg,Hale)
+dat$id<-rownames(dat)
+edit(dat)
+
+# if write to file:
+# write.csv(dat, file="C:/Users/Qun/Desktop/Crime_data_Jefferson.csv", row.names=FALSE)
